@@ -15,12 +15,28 @@ public class CertificateUpdateGenerator {
     }
 
     public Stream<CertificateUpdate> generateQuotes() {
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        // TODO: Implement me.
-        List<CertificateUpdate> updateList = new ArrayList<CertificateUpdate>();
-        for (int i = 0; i < threads * quotes; i++) {
-            updateList.add(new CertificateUpdate());
-        }
-        return Stream.generate(CertificateUpdate::new).parallel().limit(quotes);
+        ISINGenerator isinGenerator = new ISINGenerator();
+
+        return Stream
+                .generate(() -> new CertificateUpdate(
+                System.currentTimeMillis(),
+                isinGenerator.generate(),
+                randomPrice(),
+                randomBidSize(),
+                randomPrice(),
+                randomAskSize()
+        )).parallel().limit(quotes);
+    }
+
+    private double randomPrice() {
+        return ThreadLocalRandom.current().nextDouble(100.0, 200.01);
+    }
+
+    private int randomBidSize() {
+        return ThreadLocalRandom.current().nextInt(1000, 5001);
+    }
+
+    private int randomAskSize() {
+        return ThreadLocalRandom.current().nextInt(1000, 10001);
     }
 }
